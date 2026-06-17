@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermercado do Consumo Consciente - PIBID</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        /* CONFIGURAÇÕES GERAIS - TEMA DARK/NEON */
+        :root {
+            --bg-dark: #0b0c10;
+            --bg-card: #1f2833;
+            --accent-cyan: #4630d4;
+            --electric-cyan: #00f0ff;
+            --neon-pink: #ff007f;
+            --text-light: #c5c6c7;
+            --white: #ffffff;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --warning: #ffcc00;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #12121c 0%, #1f2833 100%);
+            border-bottom: 2px solid var(--electric-cyan);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header img {
+            height: 70px;
+            margin-bottom: 15px;
+        }
+
+        header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--white); text-shadow: 0 0 10px var(--electric-cyan); letter-spacing: 2px; line-height: 1.2; }
+        header p { font-size: 1.1rem; color: var(--electric-cyan); margin-top: 5px; text-transform: uppercase; }
+        header .authors { font-size: 0.95rem; color: var(--text-light); margin-top: 10px; }
+
+        /* ABAS */
+        .tabs { display: flex; justify-content: center; background-color: #121212; border-bottom: 1px solid #333; flex-wrap: wrap;}
+        .tab-btn {
+            background: none; border: none; color: var(--text-light);
+            font-family: 'Orbitron', sans-serif; font-size: 1rem; padding: 12px 20px;
+            cursor: pointer; transition: all 0.3s ease; position: relative;
+        }
+        .tab-btn:hover { color: var(--electric-cyan); }
+        .tab-btn.active { color: var(--electric-cyan); font-weight: bold; background: rgba(0, 240, 255, 0.05); }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background-color: var(--electric-cyan); box-shadow: 0 0 10px var(--electric-cyan);
+        }
+
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* PAINÉIS */
+        .panel { background-color: var(--bg-card); border: 1px solid #333; border-radius: 8px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px;}
+        .panel h2 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--white); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+
+        .btn {
+            background: transparent; border: 2px solid var(--electric-cyan); color: var(--electric-cyan);
+            font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 1rem;
+            padding: 10px 20px; cursor: pointer; border-radius: 4px; transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover { background-color: var(--electric-cyan); color: var(--bg-dark); box-shadow: 0 0 20px var(--electric-cyan); }
+        .btn-success { border-color: var(--success); color: var(--success); }
+        .btn-success:hover { background-color: var(--success); color: var(--bg-dark); box-shadow: 0 0 20px var(--success); }
+        .btn-danger { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-danger:hover { background-color: var(--neon-pink); color: var(--white); box-shadow: 0 0 20px var(--neon-pink); }
+
+        .input-field, .select-field { background-color: rgba(0,0,0,0.5); border: 1px solid #555; color: var(--white); font-family: 'Orbitron', sans-serif; font-size: 1.2rem; padding: 10px; border-radius: 4px; width: 100%;}
+        .input-field:focus, .select-field:focus { outline: none; border-color: var(--electric-cyan); }
+
+        /* ================= CAIXA (PDV) ================= */
+        .pos-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .pos-grid { grid-template-columns: 1fr; } }
+        
+        .receipt-area { background: #fff; color: #000; padding: 20px; border-radius: 4px; min-height: 400px; font-family: monospace; font-size: 1.2rem; position: relative;}
+        .receipt-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold;}
+        .receipt-items { min-height: 250px; }
+        .receipt-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .receipt-total { border-top: 2px dashed #000; padding-top: 10px; margin-top: 10px; font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; }
+        
+        .scanner-area { display: flex; flex-direction: column; gap: 15px; }
+        .scanner-status { padding: 15px; background: rgba(0,255,136,0.1); border: 1px solid var(--success); color: var(--success); border-radius: 4px; text-align: center; font-weight: bold; }
+        .scanner-status.waiting { background: rgba(255,204,0,0.1); border-color: var(--warning); color: var(--warning); }
+        
+        .big-total-display { background: #000; color: var(--success); font-family: 'Orbitron', sans-serif; font-size: 3rem; text-align: center; padding: 20px; border-radius: 8px; border: 2px solid #333; }
+
+        .ranking-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: var(--white); }
+        .ranking-table th, .ranking-table td { border: 1px solid #444; padding: 10px; text-align: center; }
+        .ranking-table th { background: rgba(0, 240, 255, 0.1); font-family: 'Orbitron'; color: var(--electric-cyan); }
+
+        /* ================= ETIQUETAS E PRODUTOS ================= */
+        .print-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; flex-wrap: wrap; gap: 10px;}
+        
+        .labels-grid { display: flex; flex-wrap: wrap; gap: 10px; background: #fff; padding: 20px; border-radius: 8px; justify-content: center;}
+        .price-tag { border: 2px dashed #000; padding: 10px; text-align: center; color: #000; font-family: 'Rajdhani', sans-serif; background: #fff; width: 180px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;}
+        .tag-product-name { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: bold; color: #111; border-bottom: 1px solid #ccc; padding-bottom: 5px; line-height: 1.1;}
+        .tag-base-price { font-size: 2rem; font-weight: bold; color: #000; margin: 0; padding: 0; line-height: 1;}
+
+        .promos-grid { display: block; text-align: center; background: #fff; padding: 20px; border-radius: 8px;}
+        .promo-badge { display: inline-flex; border: 4px solid #000; border-radius: 50%; width: 140px; height: 140px; align-items: center; justify-content: center; text-align: center; font-family: 'Orbitron', sans-serif; font-weight: bold; background: #ffcc00; color: #000; font-size: 1.6rem; line-height: 1.1; box-shadow: 4px 4px 0px #000; margin: 15px;}
+        .promo-badge.danger { background: #ff3366; color: #fff; border-color: #000; }
+        .promo-badge.neutral { border-radius: 12px; font-size: 1.4rem; width: 160px; height: 80px; background: #eee;}
+
+        .products-grid-large { display: flex; flex-wrap: wrap; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; justify-content: center;}
+        .products-grid-small { display: flex; flex-wrap: wrap; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; justify-content: center;}
+        
+        .product-pack { text-align: center; color: #000; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        
+        .product-img-wrapper { position: relative; display: inline-block; line-height: 0; }
+        .product-img-wrapper img { width: 100%; height: auto; display: block; object-fit: contain; }
+        
+        .product-pack.large { width: calc(50% - 15px); } 
+        .product-pack.small { width: calc(25% - 15px); } 
+        
+        .product-pack.large .product-img-wrapper img { max-height: 350px; }
+        .product-pack.small .product-img-wrapper img { max-height: 200px; }
+        
+        .barcode-container {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #666;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            z-index: 10;
+            line-height: normal;
+        }
+        /* Aumentei significativamente o tamanho para os produtos pequenos também */
+        .large .barcode-container svg { width: 100%; max-width: 140px; height: 45px; }
+        .small .barcode-container svg { width: 100%; max-width: 110px; height: 38px; }
+
+        /* ================= GUIA E INTRO ================= */
+        .guide-panel { background-color: #fff; color: #000; }
+        table.gabarito { width: 100%; border-collapse: collapse; margin-bottom: 20px; color: #000; background: #fff; font-size: 0.95rem;}
+        table.gabarito th, table.gabarito td { border: 1px solid #000; padding: 8px; text-align: center; }
+        table.gabarito th { background-color: #f4f4f4; font-family: 'Orbitron', sans-serif; }
+        .table-best { background-color: #d4edda; font-weight: bold; color: #155724; }
+        
+        .intro-box { background: rgba(0, 240, 255, 0.05); border-left: 4px solid var(--electric-cyan); padding: 20px; margin-bottom: 20px;}
+        .lousa { background: #1a3622; border: 8px solid #8b5a2b; padding: 20px; border-radius: 4px; color: #fff; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 1.2rem; margin: 20px 0; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+        .fraction-explainer { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .fraction-explainer p { margin-top: 5px; line-height: 1.6; }
+
+        /* ================= IMPRESSÃO ================= */
+        @media print {
+            body { background-color: #ffffff !important; color: #000000 !important; margin: 0 !important; padding: 0 !important; font-size: 12pt; }
+            header, .tabs, .print-controls { display: none !important; }
+            .print-hidden { display: none !important; }
+            
+            .tab-content { display: none !important; }
+            .tab-content.active { display: block !important; }
+            
+            .panel { box-shadow: none !important; border: none !important; background-color: transparent !important; color: #000 !important; margin: 0 !important; padding: 0 !important; }
+            .panel h2, .fraction-explainer strong { color: #000 !important; }
+            .fraction-explainer { background: transparent !important; border-color: #ccc !important; }
+            
+            .labels-grid { padding: 0 !important; justify-content: flex-start !important; display: flex !important; flex-wrap: wrap !important; gap: 5mm !important;}
+            .price-tag { page-break-inside: avoid !important; break-inside: avoid !important; border: 1px dashed #000; width: 45mm !important; min-height: 35mm !important; height: auto !important; padding: 3mm !important;}
+            
+            .promos-grid { padding: 0 !important; text-align: left !important; }
+            .promo-badge { page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 15mm !important; margin-right: 10mm !important; }
+            
+            .products-grid-large, .products-grid-small { padding: 0 !important; display: flex !important; flex-wrap: wrap !important; gap: 0 !important; justify-content: space-around !important;}
+            
+            /* Padrão para TODOS os produtos (Grandes e Pequenos): Grade 2x2 (4 itens por página) para economizar papel */
+            .product-pack.large, .product-pack.small { 
+                width: 48% !important; 
+                height: 46vh !important; /* Força 2 linhas por folha */
+                margin-bottom: 1vh !important; 
+                page-break-inside: avoid !important; 
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            } 
+            
+            /* As imagens vão se adaptar à altura do contêiner de 46vh */
+            .product-img-wrapper { max-height: 100% !important; display: inline-block !important; }
+            .product-img-wrapper img { max-height: 42vh !important; width: auto !important; margin: 0 auto !important; }
+            
+            .guide-panel, .lousa, .intro-box { box-shadow: none !important; border: 1px solid #ccc !important; background: #fff !important; color: #000 !important;}
+            .lousa { background: #f9f9f9 !important; border: 2px solid #000 !important; color: #000 !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781662337/dakz1wjsar6xpener1ur.png" alt="Logo PIBID">
+        <h1>MERCADINHO DA Pe. JOSÉ SCHARDONG</h1>
+        <p>Matemática, Porcentagem e Educação Financeira</p>
+        <div class="authors">Desenvolvido por: Mateus Goldschmidt e Lavínia Mello Ferreira (PIBID)</div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('intro')">🏫 Introdução à Aula</button>
+        <button class="tab-btn" onclick="switchTab('caixa')">🛒 Caixa e Grupos</button>
+        <button class="tab-btn" onclick="switchTab('etiquetas')">🏷️ Imprimir Preços</button>
+        <button class="tab-btn" onclick="switchTab('promos')">💥 Imprimir Promos</button>
+        <button class="tab-btn" onclick="switchTab('embalagens')">📦 Imprimir Produtos</button>
+        <button class="tab-btn" onclick="switchTab('guia')">📚 Gabarito das Rodadas</button>
+    </div>
+
+    <div class="container">
+
+        <!-- ABA 1: INTRODUÇÃO E PREPARAÇÃO -->
+        <div id="tab-intro" class="tab-content active">
+            <div class="panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Guia do Professor</span><br>
+                        <span style="font-size: 0.9rem;">Imprima este roteiro para utilizar durante a explicação.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Guia</button>
+                </div>
+
+                <h2 style="margin-top: 20px;">Como Preparar a Turma (6º Ano)</h2>
+                
+                <div class="intro-box">
+                    <h3 style="color: var(--electric-cyan); margin-bottom: 15px;">O Segredo das Frações (A Lógica do "Por Cem")</h3>
+                    <p style="margin-bottom: 15px;">Como a turma do 6º ano ainda está construindo a ideia de números decimais, o foco deve ser a compreensão visual e fracionária. Ensine que <strong>porcentagem significa literalmente "partes de um total de 100"</strong>.</p>
+                    <p style="margin-bottom: 20px;">A melhor forma de fazê-los deduzirem as frações é questionando quantas vezes a porcentagem "cabe" dentro do 100. Veja o roteiro prático para a lousa:</p>
+                    
+                    <div class="fraction-explainer">
+                        <strong style="color: var(--warning); font-size: 1.2rem;">50% (A Metade):</strong>
+                        <p>Pergunte: <em>"Quantas vezes o 50 cabe dentro de 100?"</em> A resposta é 2 (pois 100 ÷ 50 = 2). Portanto, 50% é o mesmo que a fração <strong>50/100</strong>, que simplificando vira <strong>1/2</strong>. Para achar 50% de qualquer valor, a regra é <strong>dividir por 2</strong>.</p>
+                    </div>
+
+                    <div class="fraction-explainer">
+                        <strong style="color: var(--warning); font-size: 1.2rem;">25% (A Quarta Parte):</strong>
+                        <p>Pergunte: <em>"Quantas moedas de 25 centavos precisamos para formar 1 real (100 centavos)?"</em> São 4 moedas (pois 100 ÷ 25 = 4). Então, 25 partes de 100 é a fração <strong>25/100</strong>, que dividindo em cima e embaixo por 25, simplifica para <strong>1/4</strong>. Para calcular 25%, basta <strong>dividir o valor por 4</strong>.</p>
+                    </div>
+
+                    <div class="fraction-explainer">
+                        <strong style="color: var(--warning); font-size: 1.2rem;">10% (A Décima Parte):</strong>
+                        <p>Pergunte: <em>"Quantas vezes o 10 cabe no 100?"</em> São 10 vezes (100 ÷ 10 = 10). Isso constrói a fração <strong>10/100</strong>, ou seja, <strong>1/10</strong>. A maneira mais fácil de calcular é simplesmente <strong>dividir o valor por 10</strong> (ou "andar uma casa/cortar um zero").</p>
+                    </div>
+
+                    <div class="fraction-explainer">
+                        <strong style="color: var(--warning); font-size: 1.2rem;">20% (A Quinta Parte ou o Dobro de 10%):</strong>
+                        <p>O 20 cabe 5 vezes no 100 (100 ÷ 20 = 5), gerando a fração <strong>1/5</strong> (dividir por 5). Mas a dica de ouro para agilizar o cálculo mental dos alunos no mercadinho é outra: ensine-os a <strong>achar os 10% primeiro (dividindo por 10) e depois apenas multiplicar o resultado por 2!</strong></p>
+                    </div>
+                </div>
+
+                <h3>Exemplo Prático para a Lousa</h3>
+                <p>Após construir a lógica das frações, faça este exemplo no quadro com a participação deles para introduzir a dinâmica do jogo:</p>
+                
+                <div class="lousa">
+                    <p>🎮 <strong>O PROBLEMA DO VIDEOGAME</strong></p>
+                    <p style="margin-top: 15px;">Um jogo custa <strong>R$ 120,00</strong>.</p>
+                    <p>A loja A oferece <strong>25% de desconto</strong>.</p>
+                    <p>A loja B oferece <strong>50% de desconto</strong>, mas aumentou o preço para <strong>R$ 200,00</strong> antes da promoção!</p>
+                    <p style="margin-top: 15px; font-weight: bold;">Onde é mais barato comprar?</p>
+                    <hr style="border: 1px dashed rgba(255,255,255,0.3); margin: 15px 0;">
+                    <p><em>Resolução Loja A:</em> 120 ÷ 4 = R$ 30 de desconto. (Paga R$ 90)</p>
+                    <p><em>Resolução Loja B:</em> 200 ÷ 2 = R$ 100 de desconto. (Paga R$ 100)</p>
+                    <p style="margin-top: 10px;"><strong>Lição:</strong> O maior percentual de desconto nem sempre garante o menor preço! Sempre calcule usando o valor base.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: CAIXA REGISTRADORA E GRUPOS -->
+        <div id="tab-caixa" class="tab-content">
+            <div class="panel">
+                <h2>Ponto de Venda (PDV) e Competição</h2>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex-grow: 1; min-width: 250px;">
+                        <label style="font-family: 'Orbitron'; font-size: 0.9rem; color: var(--electric-cyan);">Nome do Grupo:</label>
+                        <input type="text" id="pos-group-name" class="input-field" placeholder="Ex: Os Matemáticos" autocomplete="off">
+                    </div>
+                    <div style="min-width: 200px;">
+                        <label style="font-family: 'Orbitron'; font-size: 0.9rem; color: var(--electric-cyan);">Rodada Atual (Sistema):</label>
+                        <select id="pos-round-selector" class="select-field">
+                            <option value="1">Rodada 1</option>
+                            <option value="2">Rodada 2</option>
+                            <option value="3">Rodada 3</option>
+                            <option value="4">Rodada 4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pos-grid">
+                    <!-- Esquerda: Cupom Fiscal -->
+                    <div class="receipt-area">
+                        <div class="receipt-header">
+                            MERCADINHO DA Pe. JOSÉ SCHARDONG<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">CUPOM FISCAL NÃO-ELETRÔNICO</span><br>
+                            <span id="receipt-group-display" style="font-size: 0.8rem;">GRUPO: NÃO INFORMADO</span>
+                        </div>
+                        <div class="receipt-items" id="receipt-items">
+                            <!-- Itens escaneados entram aqui -->
+                        </div>
+                        <div class="receipt-total">
+                            <span>TOTAL:</span>
+                            <span id="receipt-total-val">R$ 0,00</span>
+                        </div>
+                        <div id="receipt-change-area" style="display:none; margin-top: 10px; border-top: 1px solid #ccc; padding-top:10px;">
+                            <div style="display:flex; justify-content:space-between; font-size: 1.2rem;">
+                                <span>DINHEIRO RECEBIDO:</span><span>R$ 100,00</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size: 1.5rem; color: #d35400; font-weight:bold; margin-top:5px;">
+                                <span>TROCO:</span><span id="receipt-change-val">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Direita: Controles e Scanner -->
+                    <div class="scanner-area">
+                        <div class="scanner-status waiting" id="scanner-status">
+                            Aguardando Leitor de Código...
+                        </div>
+                        
+                        <input type="text" id="barcode-input" class="input-field" placeholder="Clique aqui e escaneie..." autocomplete="off">
+                        
+                        <div class="big-total-display" id="big-total">R$ 0,00</div>
+                        
+                        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn btn-success" onclick="finishCheckout()" style="padding: 15px; font-size: 1.1rem;">Finalizar Compra e Salvar</button>
+                            <button class="btn btn-danger" onclick="resetPOS()">Cancelar / Limpar</button>
+                        </div>
+                        
+                        <div style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                            *Dica: Deixe o cursor piscando na caixa de texto acima para o leitor físico funcionar. O leitor apertará "Enter" automaticamente.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 40px; font-family: 'Orbitron'; color: var(--electric-cyan); border-bottom: 1px solid #444; padding-bottom: 10px;">🏆 Placar Geral das Compras</h3>
+                <table class="ranking-table" id="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Grupo</th>
+                            <th>Rodada</th>
+                            <th>Total Gasto</th>
+                            <th>Troco Recebido</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body">
+                        <!-- Rankings injetados via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 3: ETIQUETAS DE PREÇO (BASE) -->
+        <div id="tab-etiquetas" class="tab-content">
+            <div class="panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Etiquetas Base (Valores Fixos)</span><br>
+                        <span style="font-size: 0.9rem;">Imprima apenas uma vez. Recorte e cole na prateleira.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Etiquetas</button>
+                </div>
+                <div class="labels-grid" id="labels-container">
+                    <!-- Etiquetas geradas via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 4: PROMOS (DESTAQUES) -->
+        <div id="tab-promos" class="tab-content">
+            <div class="panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Selo de Promoções (Móveis)</span><br>
+                        <span style="font-size: 0.9rem;">Imprima, recorte e troque os selos de produto em cada rodada seguindo o Gabarito.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Selos</button>
+                </div>
+                <div class="promos-grid" id="promos-container">
+                    <!-- Promos geradas via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 5: EMBALAGENS DOS PRODUTOS -->
+        <div id="tab-embalagens" class="tab-content">
+            <div class="panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Embalagens com Código de Barras Único</span><br>
+                        <span style="font-size: 0.9rem;">O código de barras pode ser lido por leitor.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Produtos</button>
+                </div>
+                
+                <h3 class="print-hidden" style="color: #000; background: #fff; padding: 10px; border-radius: 4px 4px 0 0; border-bottom: 2px solid #ccc;">PRODUTOS GRANDES (Sacos de 5kg e 1kg)</h3>
+                <div class="products-grid-large" id="products-large-container">
+                    <!-- Produtos Grandes (Arroz e Farinha) -->
+                </div>
+
+                <h3 class="print-hidden" style="color: #000; background: #fff; padding: 10px; border-radius: 4px 4px 0 0; border-bottom: 2px solid #ccc; margin-top: 20px;">PRODUTOS PEQUENOS (Pacotes e Caixas)</h3>
+                <div class="products-grid-small" id="products-small-container">
+                    <!-- Produtos Pequenos (Feijão, Café, Leite) -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 6: GUIA DO PROFESSOR (GABARITO) -->
+        <div id="tab-guia" class="tab-content">
+            <div class="panel guide-panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Gabarito e Montagem das Rodadas</span><br>
+                        <span style="font-size: 0.9rem;">Imprima este gabarito para acompanhar a colagem dos selos e auditar os alunos.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Gabarito</button>
+                </div>
+
+                <p style="margin-top: 20px; margin-bottom: 15px;"><strong>Como organizar:</strong> Os valores base das etiquetas NUNCA mudam. Em cada rodada, você só precisa pegar os <strong>Selos de Promoção</strong> impressos e colocar em cima do produto correto seguindo a tabela abaixo.</p>
+                <p style="margin-bottom: 15px;">A regra do Leite: O aluno deve comprar sempre <strong>2 caixas</strong>. O caixa vai ler o código de barras de 1 caixa e já registrar o "Combo de 2 Unidades" com o valor final embutido.</p>
+
+                <div id="guide-tables-container">
+                    <!-- Tabelas geradas via JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // BANCO DE DADOS (Base Fixa + Promos Dinâmicas)
+        // Valores Base foram calculados para que 10%, 20%, 25% e 50% resultem em Inteiros.
+        // Nomes simplificados para etiquetas limpas.
+        // ==========================================
+        const PRODUCTS = [
+            // ----- ARROZ -----
+            { id: 101, category: "Arroz", name: "Arroz Grão Mestre 5kg", brand: "Grão Mestre", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781654520/ndwwy5u8p4cbmpcr4wdb.png", base: 40,
+              rounds: { 1: { promo: "Sem Promoção", val: 40 }, 2: { promo: "10% OFF", val: 36 }, 3: { promo: "20% OFF", val: 32 }, 4: { promo: "25% OFF", val: 30 } }
+            },
+            { id: 102, category: "Arroz", name: "Arroz Prato Cheio 5kg", brand: "Prato Cheio", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781654823/sir3hanjqsi23qqpovek.png", base: 60,
+              rounds: { 1: { promo: "10% OFF", val: 54 }, 2: { promo: "20% OFF", val: 48 }, 3: { promo: "50% OFF", val: 30 }, 4: { promo: "25% OFF", val: 45 } }
+            },
+            { id: 103, category: "Arroz", name: "Arroz Fazenda 5kg", brand: "Fazenda", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655015/ny0jl8kr9qhtg8g3f35q.png", base: 80,
+              rounds: { 1: { promo: "50% OFF", val: 40 }, 2: { promo: "25% OFF", val: 60 }, 3: { promo: "10% OFF", val: 72 }, 4: { promo: "Sem Promoção", val: 80 } }
+            },
+            { id: 104, category: "Arroz", name: "Arroz Ouro Branco 5kg", brand: "Ouro Branco", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655286/hwfb1tsd4ppp1prbhue1.png", base: 30,
+              rounds: { 1: { promo: "Sem Promoção", val: 30 }, 2: { promo: "10% OFF", val: 27 }, 3: { promo: "Sem Promoção", val: 30 }, 4: { promo: "10% OFF", val: 27 } }
+            },
+
+            // ----- FARINHA ----- 
+            { id: 401, category: "Farinha", name: "Farinha Trigo Real 1kg", brand: "Trigo Real", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658477/vzq6lsxl4uyotjptcjxm.png", base: 20,
+              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "50% OFF", val: 10 }, 4: { promo: "25% OFF", val: 15 } }
+            },
+            { id: 402, category: "Farinha", name: "Farinha Branca Neve 1kg", brand: "Branca Neve", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658550/riillri6lnmxisybbd3h.png", base: 40,
+              rounds: { 1: { promo: "50% OFF", val: 20 }, 2: { promo: "25% OFF", val: 30 }, 3: { promo: "10% OFF", val: 36 }, 4: { promo: "20% OFF", val: 32 } }
+            },
+            { id: 403, category: "Farinha", name: "Farinha Padeiro 1kg", brand: "Padeiro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658633/qzfkdshztjp6i1phi3uq.png", base: 10,
+              rounds: { 1: { promo: "10% OFF", val: 9 }, 2: { promo: "Sem Promoção", val: 10 }, 3: { promo: "Sem Promoção", val: 10 }, 4: { promo: "10% OFF", val: 9 } }
+            },
+            { id: 404, category: "Farinha", name: "Farinha Massa Fina 1kg", brand: "Massa Fina", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658672/rlwpyon2w7dtbtbrluky.png", base: 16,
+              rounds: { 1: { promo: "25% OFF", val: 12 }, 2: { promo: "50% OFF", val: 8 }, 3: { promo: "25% OFF", val: 12 }, 4: { promo: "50% OFF", val: 8 } }
+            },
+
+            // ----- FEIJÃO -----
+            { id: 201, category: "Feijão", name: "Feijão Caldo Grosso 1kg", brand: "Caldo Grosso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655488/yreznem8zms6a7rcvz7x.png", base: 20,
+              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "25% OFF", val: 15 }, 3: { promo: "10% OFF", val: 18 }, 4: { promo: "50% OFF", val: 10 } }
+            },
+            { id: 202, category: "Feijão", name: "Feijão Da Roça 1kg", brand: "Da Roça", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655775/rjkye4e1rlwvn2hl54he.png", base: 24,
+              rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF", val: 12 }, 3: { promo: "Sem Promoção", val: 24 }, 4: { promo: "25% OFF", val: 18 } }
+            },
+            { id: 203, category: "Feijão", name: "Feijão Panela de Barro 1kg", brand: "Panela de Barro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655957/te7fzhme3wynojka6ekk.png", base: 10,
+              rounds: { 1: { promo: "10% OFF", val: 9 }, 2: { promo: "Sem Promoção", val: 10 }, 3: { promo: "10% OFF", val: 9 }, 4: { promo: "Sem Promoção", val: 10 } }
+            },
+            { id: 204, category: "Feijão", name: "Feijão Saboroso 1kg", brand: "Saboroso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656268/bsdxmvj3ndpzxw2kdxyx.png", base: 40,
+              rounds: { 1: { promo: "50% OFF", val: 20 }, 2: { promo: "20% OFF", val: 32 }, 3: { promo: "25% OFF", val: 30 }, 4: { promo: "10% OFF", val: 36 } }
+            },
+
+            // ----- CAFÉ -----
+            { id: 301, category: "Café", name: "Café Desperta 500g", brand: "Desperta", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656762/toa9bht5r3enrzz4d3yy.png", base: 40,
+              rounds: { 1: { promo: "10% OFF", val: 36 }, 2: { promo: "25% OFF", val: 30 }, 3: { promo: "50% OFF", val: 20 }, 4: { promo: "Sem Promoção", val: 40 } }
+            },
+            { id: 302, category: "Café", name: "Café Bom Dia 500g", brand: "Bom Dia", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656937/wjgd1mbhpvy4h9czpys0.png", base: 30,
+              rounds: { 1: { promo: "20% OFF", val: 24 }, 2: { promo: "10% OFF", val: 27 }, 3: { promo: "Sem Promoção", val: 30 }, 4: { promo: "20% OFF", val: 24 } }
+            },
+            { id: 303, category: "Café", name: "Café Grão Torrado 500g", brand: "Grão Torrado", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657127/lbzcqtzaj3oh3fbn3ut5.png", base: 20,
+              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "25% OFF", val: 15 }, 4: { promo: "50% OFF", val: 10 } }
+            },
+            { id: 304, category: "Café", name: "Café Aroma 500g", brand: "Aroma", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657277/cjubnx3jesfaw1wczqxd.png", base: 16,
+              rounds: { 1: { promo: "25% OFF", val: 12 }, 2: { promo: "50% OFF", val: 8 }, 3: { promo: "25% OFF", val: 12 }, 4: { promo: "Sem Promoção", val: 16 } }
+            },
+
+            // ----- LEITE -----
+            { id: 501, category: "Leite", name: "Leite Campo Limpo (Combo)", brand: "Campo Limpo", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657453/n4xbu3yvworjucxapajg.png", base: 10,
+              rounds: { 1: { promo: "Sem Promoção", val: 10 }, 2: { promo: "10% OFF", val: 9 }, 3: { promo: "20% OFF", val: 8 }, 4: { promo: "Sem Promoção", val: 10 } }
+            },
+            { id: 502, category: "Leite", name: "Leite Mimoso (Combo)", brand: "Mimoso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657595/vr9gle0ktsgxvvl9u8dk.png", base: 12,
+              rounds: { 1: { promo: "50% OFF na 2ª Un", val: 9 }, 2: { promo: "Sem Promoção", val: 12 }, 3: { promo: "25% OFF Total", val: 9 }, 4: { promo: "50% OFF na 2ª Un", val: 9 } }
+            },
+            { id: 503, category: "Leite", name: "Leite Via Láctea (Combo)", brand: "Via Láctea", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657728/ao2oomrtt2csw5fzopbw.png", base: 16,
+              rounds: { 1: { promo: "25% OFF Total", val: 12 }, 2: { promo: "50% OFF na 2ª Un", val: 12 }, 3: { promo: "50% OFF Total", val: 8 }, 4: { promo: "25% OFF Total", val: 12 } }
+            },
+            { id: 504, category: "Leite", name: "Leite Puro Pasto (Combo)", brand: "Puro Pasto", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657878/pwi3szg4qnpqaqba1o8m.png", base: 20,
+              rounds: { 1: { promo: "10% OFF", val: 18 }, 2: { promo: "20% OFF", val: 16 }, 3: { promo: "Sem Promoção", val: 20 }, 4: { promo: "50% OFF na 2ª Un", val: 15 } }
+            }
+        ];
+
+        // ==========================================
+        // LÓGICA DE NAVEGAÇÃO
+        // ==========================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            if(tab === 'caixa') {
+                document.getElementById('barcode-input').focus();
+            }
+        }
+
+        // ==========================================
+        // LÓGICA DO CAIXA E RANKING GRUPOS
+        // ==========================================
+        let cart = [];
+        let rankingData = [];
+        
+        function formatMoney(value) { return "R$ " + value.toFixed(2).replace('.', ','); }
+
+        const barcodeInput = document.getElementById('barcode-input');
+        barcodeInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                processBarcode(barcodeInput.value.trim());
+                barcodeInput.value = '';
+            }
+        });
+
+        document.querySelector('.scanner-area').addEventListener('click', () => { barcodeInput.focus(); });
+
+        document.getElementById('pos-group-name').addEventListener('input', function() {
+            let name = this.value.trim();
+            document.getElementById('receipt-group-display').innerText = "GRUPO: " + (name ? name.toUpperCase() : "NÃO INFORMADO");
+        });
+
+        function processBarcode(code) {
+            if(!code || code.length < 3) return;
+            
+            const productId = parseInt(code);
+            const currentRound = parseInt(document.getElementById('pos-round-selector').value);
+
+            const product = PRODUCTS.find(p => p.id === productId);
+            if(product && product.rounds[currentRound]) {
+                const finalPrice = product.rounds[currentRound].val;
+                cart.push({
+                    name: product.category,
+                    brand: product.brand,
+                    price: finalPrice
+                });
+                renderCart();
+                
+                document.getElementById('scanner-status').className = 'scanner-status';
+                document.getElementById('scanner-status').innerText = '✅ Lido: ' + product.brand;
+                setTimeout(() => {
+                    document.getElementById('scanner-status').className = 'scanner-status waiting';
+                    document.getElementById('scanner-status').innerText = 'Aguardando próximo...';
+                }, 1500);
+            } else {
+                alert("Produto não encontrado!");
+            }
+        }
+
+        function renderCart() {
+            const list = document.getElementById('receipt-items');
+            list.innerHTML = '';
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                total += item.price;
+                list.innerHTML += `
+                    <div class="receipt-item">
+                        <span>${String(index + 1).padStart(2, '0')} - ${item.name} (${item.brand})</span>
+                        <span>${formatMoney(item.price)}</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('receipt-total-val').innerText = formatMoney(total);
+            document.getElementById('big-total').innerText = formatMoney(total);
+        }
+
+        function finishCheckout() {
+            if(cart.length === 0) return;
+            let groupName = document.getElementById('pos-group-name').value.trim() || "Grupo Anônimo";
+            let round = document.getElementById('pos-round-selector').value;
+            
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let troco = 100 - total;
+            
+            document.getElementById('receipt-change-area').style.display = 'block';
+            document.getElementById('receipt-change-val').innerText = formatMoney(troco);
+            
+            let status = "✅ Ótimo";
+            if(troco < 0) {
+                document.getElementById('receipt-change-val').style.color = "red";
+                status = "❌ Estourou R$100";
+            }
+            
+            rankingData.push({ group: groupName, round: round, total: total, troco: troco, status: status });
+            renderRanking();
+            
+            barcodeInput.focus();
+        }
+
+        function resetPOS() {
+            cart = [];
+            renderCart();
+            document.getElementById('receipt-change-area').style.display = 'none';
+            document.getElementById('big-total').innerText = formatMoney(0);
+            barcodeInput.focus();
+        }
+
+        function renderRanking() {
+            const tbody = document.getElementById('ranking-body');
+            tbody.innerHTML = '';
+            let sorted = [...rankingData].sort((a,b) => b.troco - a.troco);
+            
+            sorted.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${r.group}</strong></td>
+                        <td>R${r.round}</td>
+                        <td>${formatMoney(r.total)}</td>
+                        <td style="color: ${r.troco < 0 ? 'var(--danger)' : 'var(--success)'}; font-weight: bold;">${formatMoney(r.troco)}</td>
+                        <td>${r.status}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ==========================================
+        // GERADOR DE ETIQUETAS DE PREÇO FIXO
+        // ==========================================
+        function renderLabels() {
+            const container = document.getElementById('labels-container');
+            container.innerHTML = '';
+
+            PRODUCTS.forEach(product => {
+                const subtext = product.category === "Leite" ? "PREÇO TOTAL (2 CAIXAS)" : "PREÇO NORMAL";
+                
+                const tagHTML = `
+                    <div class="price-tag">
+                        <div class="tag-product-name">${product.name}</div>
+                        <div style="font-size: 0.8rem; color: #555; margin-top: auto;">${subtext}:</div>
+                        <div class="tag-base-price">${formatMoney(product.base)}</div>
+                    </div>
+                `;
+                container.innerHTML += tagHTML;
+            });
+        }
+
+        // ==========================================
+        // GERADOR DE SELOS DE PROMOÇÃO
+        // ==========================================
+        function renderPromos() {
+            const container = document.getElementById('promos-container');
+            container.innerHTML = '';
+            
+            const promoTypes = [
+                { text: "10% OFF", class: "danger", count: 6 },
+                { text: "20% OFF", class: "danger", count: 4 },
+                { text: "25% OFF", class: "danger", count: 6 },
+                { text: "50% OFF", class: "danger", count: 6 },
+                { text: "50% OFF<br><span style='font-size:0.6rem;'>NA 2ª UNID</span>", class: "danger", count: 4 },
+                { text: "SEM<br>PROMOÇÃO", class: "neutral", count: 6 }
+            ];
+
+            promoTypes.forEach(p => {
+                for(let i=0; i<p.count; i++) {
+                    container.innerHTML += `<div class="promo-badge ${p.class}">${p.text}</div>`;
+                }
+            });
+        }
+
+        // ==========================================
+        // GERADOR DE EMBALAGENS (FOTOS + CÓDIGO BARRAS ÚNICO)
+        // ==========================================
+        function renderPackages() {
+            const containerLarge = document.getElementById('products-large-container');
+            const containerSmall = document.getElementById('products-small-container');
+            containerLarge.innerHTML = '';
+            containerSmall.innerHTML = '';
+            
+            PRODUCTS.forEach(product => {
+                const barcodeValue = product.id.toString();
+                
+                const html = `
+                    <div class="product-pack ${product.category === 'Arroz' || product.category === 'Farinha' ? 'large' : 'small'}">
+                        <div class="product-img-wrapper">
+                            <img src="${product.img}" alt="${product.brand}">
+                            <div class="barcode-container">
+                                <svg class="barcode" jsbarcode-value="${barcodeValue}" jsbarcode-margin="0" jsbarcode-displayValue="true" jsbarcode-fontSize="14" jsbarcode-height="40"></svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if(product.category === 'Arroz' || product.category === 'Farinha') {
+                    containerLarge.innerHTML += html;
+                } else {
+                    containerSmall.innerHTML += html;
+                }
+            });
+
+            setTimeout(() => { JsBarcode(".barcode").init(); }, 100);
+        }
+
+        // ==========================================
+        // GERADOR DO GUIA DO PROFESSOR
+        // ==========================================
+        function renderGuide() {
+            const container = document.getElementById('guide-tables-container');
+            container.innerHTML = '';
+
+            for(let r = 1; r <= 4; r++) {
+                let tableHtml = `
+                    <h3 style="margin-top: 25px; color: #1f2833; font-family: 'Orbitron';">📍 RODADA ${r}</h3>
+                    <table class="gabarito">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Marca</th>
+                                <th>Valor Base (Etiqueta Fixa)</th>
+                                <th>COLAR O SELO:</th>
+                                <th>Valor Lido no Caixa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                let currentCategory = "";
+                let bestPrices = {};
+                
+                PRODUCTS.forEach(p => {
+                    let cat = p.category;
+                    if(!bestPrices[cat]) bestPrices[cat] = 9999;
+                    if(p.rounds[r].val < bestPrices[cat]) bestPrices[cat] = p.rounds[r].val;
+                });
+
+                PRODUCTS.forEach(p => {
+                    let rData = p.rounds[r];
+                    let isBest = rData.val === bestPrices[p.category];
+                    let rowClass = isBest ? 'class="table-best"' : '';
+                    
+                    if(currentCategory !== p.category) {
+                        tableHtml += `<tr style="background:#e0e0e0;"><td colspan="5" style="text-align:left; font-weight:bold;">${p.category.toUpperCase()}</td></tr>`;
+                        currentCategory = p.category;
+                    }
+                    
+                    tableHtml += `
+                        <tr ${rowClass}>
+                            <td>${p.name}</td>
+                            <td>${p.brand}</td>
+                            <td>${formatMoney(p.base)}</td>
+                            <td style="color: #d32f2f; font-weight:bold;">${rData.promo}</td>
+                            <td>${formatMoney(rData.val)} ${isBest ? '⭐' : ''}</td>
+                        </tr>
+                    `;
+                });
+                
+                let totalIdeal = Object.values(bestPrices).reduce((a, b) => a + b, 0);
+                
+                tableHtml += `
+                        <tr style="background:#d4edda; font-weight:bold; font-size:1.1rem; color:#155724;">
+                            <td colspan="4" style="text-align:right;">🏆 COMPRA PERFEITA DA RODADA:</td>
+                            <td>${formatMoney(totalIdeal)} (Troco: ${formatMoney(100 - totalIdeal)})</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                `;
+                container.innerHTML += tableHtml;
+            }
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        window.onload = () => {
+            renderLabels();
+            renderPromos();
+            renderPackages();
+            renderGuide();
+            barcodeInput.focus();
+        };
+    </script>
+</body>
+</html>
