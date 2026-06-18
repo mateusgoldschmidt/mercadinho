@@ -97,7 +97,7 @@
         .receipt-area { background: #fff; color: #000; padding: 20px; border-radius: 4px; min-height: 400px; font-family: monospace; font-size: 1.2rem; position: relative;}
         .receipt-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold;}
         .receipt-items { min-height: 250px; }
-        .receipt-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .receipt-item { display: flex; justify-content: space-between; margin-bottom: 5px; align-items: center; }
         .receipt-total { border-top: 2px dashed #000; padding-top: 10px; margin-top: 10px; font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; }
         
         .scanner-area { display: flex; flex-direction: column; gap: 15px; }
@@ -109,6 +109,24 @@
         .ranking-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: var(--white); }
         .ranking-table th, .ranking-table td { border: 1px solid #444; padding: 10px; text-align: center; }
         .ranking-table th { background: rgba(0, 240, 255, 0.1); font-family: 'Orbitron'; color: var(--electric-cyan); }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.4rem; margin: 0 5px; transition: transform 0.2s; }
+        .action-btn:hover { transform: scale(1.2); }
+
+        /* ================= MODAL AUDITORIA ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff; color: #000; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px;
+            font-family: monospace; font-size: 1.1rem; position: relative; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,240,255,0.2); border: 2px solid var(--electric-cyan);
+        }
+        .modal-close {
+            position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.5rem; color: #d32f2f;
+            background: none; border: none; font-weight: bold;
+        }
 
         /* ================= ETIQUETAS E PRODUTOS ================= */
         .print-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; flex-wrap: wrap; gap: 10px;}
@@ -123,19 +141,15 @@
         .promo-badge.danger { background: #ff3366; color: #fff; border-color: #000; }
         .promo-badge.neutral { border-radius: 12px; font-size: 1.4rem; width: 160px; height: 80px; background: #eee;}
 
-        .products-grid-large { display: flex; flex-wrap: wrap; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; justify-content: center;}
-        .products-grid-small { display: flex; flex-wrap: wrap; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; justify-content: center;}
-        
+        /* Produtos Unificados */
+        .products-grid-unified { display: flex; flex-wrap: wrap; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; justify-content: center;}
         .product-pack { text-align: center; color: #000; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         
         .product-img-wrapper { position: relative; display: inline-block; line-height: 0; }
         .product-img-wrapper img { width: 100%; height: auto; display: block; object-fit: contain; }
         
-        .product-pack.large { width: calc(50% - 15px); } 
-        .product-pack.small { width: calc(25% - 15px); } 
-        
-        .product-pack.large .product-img-wrapper img { max-height: 350px; }
-        .product-pack.small .product-img-wrapper img { max-height: 200px; }
+        .product-pack.unified { width: calc(25% - 15px); min-width: 200px; } 
+        .product-pack.unified .product-img-wrapper img { max-height: 250px; }
         
         .barcode-container {
             position: absolute;
@@ -150,8 +164,7 @@
             z-index: 10;
             line-height: normal;
         }
-        .large .barcode-container svg { width: 100%; max-width: 140px; height: 45px; }
-        .small .barcode-container svg { width: 100%; max-width: 110px; height: 38px; }
+        .unified .barcode-container svg { width: 100%; max-width: 120px; height: 40px; }
 
         /* ================= GUIA E INTRO ================= */
         .guide-panel { background-color: #fff; color: #000; }
@@ -170,6 +183,7 @@
             body { background-color: #ffffff !important; color: #000000 !important; margin: 0 !important; padding: 0 !important; font-size: 12pt; }
             header, .tabs, .print-controls { display: none !important; }
             .print-hidden { display: none !important; }
+            .modal-overlay { display: none !important; }
             
             .tab-content { display: none !important; }
             .tab-content.active { display: block !important; }
@@ -184,12 +198,12 @@
             .promos-grid { padding: 0 !important; text-align: left !important; }
             .promo-badge { page-break-inside: avoid !important; break-inside: avoid !important; margin-bottom: 15mm !important; margin-right: 10mm !important; }
             
-            .products-grid-large, .products-grid-small { padding: 0 !important; display: flex !important; flex-wrap: wrap !important; gap: 0 !important; justify-content: space-around !important;}
+            .products-grid-unified { padding: 0 !important; display: flex !important; flex-wrap: wrap !important; gap: 0 !important; justify-content: space-around !important;}
             
-            /* Padrão para TODOS os produtos (Grandes e Pequenos): Grade 2x2 (4 itens por página) para economizar papel */
-            .product-pack.large, .product-pack.small { 
+            /* Padrão Único (4 itens por página) */
+            .product-pack.unified { 
                 width: 48% !important; 
-                height: 46vh !important; /* Força 2 linhas por folha */
+                height: 46vh !important;
                 margin-bottom: 1vh !important; 
                 page-break-inside: avoid !important; 
                 display: flex !important;
@@ -197,12 +211,13 @@
                 align-items: center !important;
             } 
             
-            /* As imagens vão se adaptar à altura do contêiner de 46vh */
             .product-img-wrapper { max-height: 100% !important; display: inline-block !important; }
             .product-img-wrapper img { max-height: 42vh !important; width: auto !important; margin: 0 auto !important; }
             
             .guide-panel, .lousa, .intro-box { box-shadow: none !important; border: 1px solid #ccc !important; background: #fff !important; color: #000 !important;}
             .lousa { background: #f9f9f9 !important; border: 2px solid #000 !important; color: #000 !important; }
+            .rules-container h3 { background: #eee !important; color: #000 !important; border: 1px solid #ccc !important; page-break-after: avoid; }
+            .rules-container { page-break-inside: auto; color: #000 !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
@@ -218,6 +233,7 @@
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('intro')">🏫 Introdução à Aula</button>
+        <button class="tab-btn" onclick="switchTab('regras')">📜 Manual de Regras</button>
         <button class="tab-btn" onclick="switchTab('caixa')">🛒 Caixa e Grupos</button>
         <button class="tab-btn" onclick="switchTab('etiquetas')">🏷️ Imprimir Preços</button>
         <button class="tab-btn" onclick="switchTab('promos')">💥 Imprimir Promos</button>
@@ -283,6 +299,63 @@
             </div>
         </div>
 
+        <!-- ABA 1.5: MANUAL DE REGRAS -->
+        <div id="tab-regras" class="tab-content">
+            <div class="panel guide-panel">
+                <div class="print-controls print-hidden">
+                    <div>
+                        <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Manual de Regras</span><br>
+                        <span style="font-size: 0.9rem;">Imprima as instruções do jogo para distribuir aos grupos.</span>
+                    </div>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Regras</button>
+                </div>
+
+                <div class="rules-container" style="line-height: 1.6;">
+                    <h2 style="color: #000; border-bottom: 2px solid #000; text-align: center; margin-bottom: 20px;">🛒 Manual de Regras: Mercadinho da Padre Traezel</h2>
+                    
+                    <p style="margin-bottom: 15px;">Vocês têm um desafio de matemática e economia nas mãos! O objetivo deste jogo é agir como consumidores inteligentes: não basta colocar os produtos no carrinho, é preciso calcular os descontos para descobrir qual marca é realmente a mais barata.</p>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">🎯 O Objetivo</h3>
+                    <p style="margin-bottom: 15px; margin-top: 10px;">Comprar todos os itens da lista obrigatória gastando o mínimo de dinheiro possível. O grupo que fechar a compra com o <strong>maior troco</strong> vence a rodada.</p>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">💰 O Orçamento</h3>
+                    <p style="margin-bottom: 15px; margin-top: 10px;">Cada grupo possui exatamente <strong>R$ 100,00</strong> para fazer as compras. Se a soma dos produtos passar desse valor, o dinheiro não será suficiente para pagar a conta no caixa!</p>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">📝 A Lista de Compras Obrigatória</h3>
+                    <p style="margin-top: 10px;">O grupo deve levar exatamente:</p>
+                    <ul style="margin-top: 10px; margin-bottom: 15px; margin-left: 20px;">
+                        <li>1 pacote de Arroz (5kg)</li>
+                        <li>1 pacote de Feijão (1kg)</li>
+                        <li>1 pacote de Farinha de Trigo (1kg)</li>
+                        <li>1 pacote de Café (500g)</li>
+                        <li><strong>2 caixas</strong> de Leite</li>
+                    </ul>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">🕹️ Modos de Jogo (Atenção ao Estoque!)</h3>
+                    <p style="margin-top: 10px; margin-bottom: 10px;">O professor avisará qual será a regra do estoque em cada rodada:</p>
+                    <ul style="margin-bottom: 15px; margin-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>Modo 1: Estoque Limitado (Corrida de Cálculo)</strong> - Atenção! Pode haver menos produtos na prateleira do que o número de grupos. Se vocês demorarem muito para calcular, outro grupo pode pegar a marca mais barata primeiro, e vocês serão obrigados a levar a marca mais cara que sobrou. Calculem rápido e peguem o produto!</li>
+                        <li><strong>Modo 2: Estoque Suficiente (Análise Calma)</strong> - Há produtos suficientes para todos os grupos. A velocidade não importa. O foco é calcular com atenção, trabalhar em equipe e ter certeza de que escolheram os produtos certos antes de ir para o caixa.</li>
+                    </ul>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">🧠 Como Calcular os Descontos</h3>
+                    <p style="margin-top: 10px; margin-bottom: 10px;">Para descobrir o verdadeiro preço de um produto, olhe o "Preço Normal" na etiqueta e o "Selo de Promoção". Em seguida, faça o cálculo!</p>
+                    <p style="margin-bottom: 15px; font-weight: bold; color: #d32f2f;">👉 Não se esqueçam: O valor do desconto deve ser subtraído do preço normal para vocês saberem quanto vão pagar de verdade!</p>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">🥛 A Regra Especial do Leite</h3>
+                    <p style="margin-bottom: 15px; margin-top: 10px;">O preço que está na etiqueta do Leite é o valor de <strong>1 caixa</strong>, mas a lista exige <strong>2 caixas</strong>. Como fazer? Simples! Se a promoção for no total da compra (ex: 20% OFF), dobre o valor da etiqueta para saber o preço das duas e calcule o desconto da soma. Se a promoção for <em>"50% de desconto na 2ª Unidade"</em>, a primeira caixa custa o preço cheio da etiqueta e a segunda caixa custa a metade!</p>
+
+                    <h3 style="color: var(--electric-cyan); background: #1f2833; padding: 10px; border-radius: 4px; margin-top: 20px;">🏁 Finalizando a Compra</h3>
+                    <ol style="margin-top: 10px; margin-bottom: 15px; margin-left: 20px;">
+                        <li>Assim que o grupo pegar todas as embalagens, dirija-se ao "Caixa do Supermercado" (mesa do professor).</li>
+                        <li>O professor vai escanear o código de barras de cada produto do grupo.</li>
+                        <li>O sistema fará a conta final automaticamente e mostrará o cupom na tela.</li>
+                        <li>Ao final da rodada, o Placar Geral mostrará qual grupo tomou as melhores decisões e conseguiu o <strong>maior troco</strong>!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
         <!-- ABA 2: CAIXA REGISTRADORA E GRUPOS -->
         <div id="tab-caixa" class="tab-content">
             <div class="panel">
@@ -341,7 +414,7 @@
                         
                         <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
                             <button class="btn btn-success" onclick="finishCheckout()" style="padding: 15px; font-size: 1.1rem;">Finalizar Compra e Salvar</button>
-                            <button class="btn btn-danger" onclick="resetPOS()">Cancelar / Limpar</button>
+                            <button class="btn btn-danger" onclick="resetPOS()">Cancelar / Limpar Carrinho</button>
                         </div>
                         
                         <div style="margin-top: 10px; font-size: 0.8rem; color: #888;">
@@ -350,7 +423,11 @@
                     </div>
                 </div>
 
-                <h3 style="margin-top: 40px; font-family: 'Orbitron'; color: var(--electric-cyan); border-bottom: 1px solid #444; padding-bottom: 10px;">🏆 Placar Geral das Compras</h3>
+                <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin: 0; font-family: 'Orbitron'; color: var(--electric-cyan);">🏆 Placar Geral das Compras</h3>
+                    <button class="btn btn-danger" onclick="clearAllRanking()" style="padding: 5px 15px; font-size: 0.9rem;">🗑️ Limpar Placar Inteiro</button>
+                </div>
+
                 <table class="ranking-table" id="ranking-table">
                     <thead>
                         <tr>
@@ -358,7 +435,7 @@
                             <th>Rodada</th>
                             <th>Total Gasto</th>
                             <th>Troco Recebido</th>
-                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="ranking-body">
@@ -406,19 +483,13 @@
                 <div class="print-controls print-hidden">
                     <div>
                         <span style="font-family: 'Orbitron'; font-size: 1.2rem;">Embalagens com Código de Barras Único</span><br>
-                        <span style="font-size: 0.9rem;">O código de barras pode ser lido por leitor.</span>
+                        <span style="font-size: 0.9rem;">O código de barras pode ser lido por leitor. Todos padronizados (4 itens por página).</span>
                     </div>
                     <button class="btn btn-success" onclick="window.print()">🖨️ Imprimir Produtos</button>
                 </div>
                 
-                <h3 class="print-hidden" style="color: #000; background: #fff; padding: 10px; border-radius: 4px 4px 0 0; border-bottom: 2px solid #ccc;">PRODUTOS GRANDES (Sacos de 5kg e 1kg)</h3>
-                <div class="products-grid-large" id="products-large-container">
-                    <!-- Produtos Grandes (Arroz e Farinha) -->
-                </div>
-
-                <h3 class="print-hidden" style="color: #000; background: #fff; padding: 10px; border-radius: 4px 4px 0 0; border-bottom: 2px solid #ccc; margin-top: 20px;">PRODUTOS PEQUENOS (Pacotes e Caixas)</h3>
-                <div class="products-grid-small" id="products-small-container">
-                    <!-- Produtos Pequenos (Feijão, Café, Leite) -->
+                <div class="products-grid-unified" id="products-unified-container">
+                    <!-- Todos os Produtos Unificados -->
                 </div>
             </div>
         </div>
@@ -435,8 +506,7 @@
                 </div>
 
                 <p style="margin-top: 20px; margin-bottom: 15px;"><strong>Como organizar:</strong> Os valores base das etiquetas NUNCA mudam. Em cada rodada, você só precisa pegar os <strong>Selos de Promoção</strong> impressos e colocar em cima do produto correto seguindo a tabela abaixo.</p>
-                <p style="margin-bottom: 15px;">A regra do Leite: O aluno deve comprar sempre <strong>2 caixas</strong>. O caixa vai ler o código de barras de 1 caixa e já registrar o "Combo de 2 Unidades" com o valor final embutido.</p>
-
+                
                 <div id="guide-tables-container">
                     <!-- Tabelas geradas via JS -->
                 </div>
@@ -445,11 +515,33 @@
 
     </div>
 
+    <!-- MODAL DE AUDITORIA DO CUPOM -->
+    <div class="modal-overlay" id="receipt-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReceiptModal()">✖</button>
+            <div class="receipt-header" style="border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px; text-align: center;">
+                <strong>MERCADINHO DA PADRE TRAEZEL</strong><br>
+                CÓPIA DE AUDITORIA<br>
+                <span id="modal-group-name" style="font-size: 0.95rem; font-weight: bold; margin-top: 5px; display: inline-block;"></span>
+            </div>
+            <div id="modal-items" style="min-height: 150px; margin-bottom: 15px;"></div>
+            <div class="receipt-total" style="border-top: 2px dashed #000; padding-top: 10px; margin-top: 10px; font-size: 1.3rem; font-weight: bold; display: flex; justify-content: space-between;">
+                <span>TOTAL:</span>
+                <span id="modal-total-val"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size: 1.3rem; color: #d35400; font-weight:bold; margin-top:5px;">
+                <span>TROCO:</span>
+                <span id="modal-change-val"></span>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==========================================
         // BANCO DE DADOS (Base Fixa + Promos Dinâmicas)
-        // Valores Base foram calculados para que 10%, 20%, 25% e 50% resultem em Inteiros.
-        // Nomes simplificados para etiquetas limpas.
+        // Valores Base de 1 unidade para todos os itens.
+        // O valor FINAL em "val" do leite representa a compra de 2 unidades,
+        // para facilitar o lançamento no caixa em um bip único.
         // ==========================================
         const PRODUCTS = [
             // ----- ARROZ -----
@@ -508,17 +600,17 @@
               rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF", val: 12 }, 3: { promo: "25% OFF", val: 18 }, 4: { promo: "Sem Promoção", val: 24 } }
             },
 
-            // ----- LEITE -----
-            { id: 501, category: "Leite", name: "Leite Campo Limpo (Combo)", brand: "Campo Limpo", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657453/n4xbu3yvworjucxapajg.png", base: 16,
+            // ----- LEITE (O valor base é para 1L, mas o valor de rodada calcula o combo de 2 unidades) -----
+            { id: 501, category: "Leite", name: "Leite Campo Limpo 1L", brand: "Campo Limpo", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657453/n4xbu3yvworjucxapajg.png", base: 8,
               rounds: { 1: { promo: "Sem Promoção", val: 16 }, 2: { promo: "25% OFF", val: 12 }, 3: { promo: "50% OFF na 2ª UNID", val: 12 }, 4: { promo: "50% OFF", val: 8 } }
             },
-            { id: 502, category: "Leite", name: "Leite Mimoso (Combo)", brand: "Mimoso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657595/vr9gle0ktsgxvvl9u8dk.png", base: 12,
+            { id: 502, category: "Leite", name: "Leite Mimoso 1L", brand: "Mimoso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657595/vr9gle0ktsgxvvl9u8dk.png", base: 6,
               rounds: { 1: { promo: "50% OFF na 2ª UNID", val: 9 }, 2: { promo: "Sem Promoção", val: 12 }, 3: { promo: "Sem Promoção", val: 12 }, 4: { promo: "50% OFF na 2ª UNID", val: 9 } }
             },
-            { id: 503, category: "Leite", name: "Leite Via Láctea (Combo)", brand: "Via Láctea", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657728/ao2oomrtt2csw5fzopbw.png", base: 20,
+            { id: 503, category: "Leite", name: "Leite Via Láctea 1L", brand: "Via Láctea", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657728/ao2oomrtt2csw5fzopbw.png", base: 10,
               rounds: { 1: { promo: "50% OFF", val: 10 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "50% OFF", val: 10 }, 4: { promo: "Sem Promoção", val: 20 } }
             },
-            { id: 504, category: "Leite", name: "Leite Puro Pasto (Combo)", brand: "Puro Pasto", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657878/pwi3szg4qnpqaqba1o8m.png", base: 24,
+            { id: 504, category: "Leite", name: "Leite Puro Pasto 1L", brand: "Puro Pasto", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657878/pwi3szg4qnpqaqba1o8m.png", base: 12,
               rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF na 2ª UNID", val: 18 }, 3: { promo: "25% OFF", val: 18 }, 4: { promo: "50% OFF na 2ª UNID", val: 18 } }
             }
         ];
@@ -539,12 +631,50 @@
         }
 
         // ==========================================
-        // LÓGICA DO CAIXA E RANKING GRUPOS
+        // LÓGICA DO CAIXA E RANKING GRUPOS (LOCALSTORAGE)
         // ==========================================
         let cart = [];
         let rankingData = [];
         
         function formatMoney(value) { return "R$ " + value.toFixed(2).replace('.', ','); }
+
+        function playCashSound() {
+            try {
+                const audio = new Audio('https://actions.google.com/sounds/v1/foley/cash_register.ogg');
+                audio.play().catch(e => playFallbackBeep());
+            } catch (e) {
+                playFallbackBeep();
+            }
+        }
+        function playFallbackBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        function saveRanking() {
+            rankingData.sort((a,b) => b.troco - a.troco);
+            localStorage.setItem('pibid_supermercado_ranking', JSON.stringify(rankingData));
+        }
+
+        function loadRanking() {
+            const data = localStorage.getItem('pibid_supermercado_ranking');
+            if(data) {
+                rankingData = JSON.parse(data);
+                renderRanking();
+            }
+        }
 
         const barcodeInput = document.getElementById('barcode-input');
         barcodeInput.addEventListener('keypress', function (e) {
@@ -564,6 +694,8 @@
         function processBarcode(code) {
             if(!code || code.length < 3) return;
             
+            document.getElementById('receipt-change-area').style.display = 'none';
+            
             const productId = parseInt(code);
             const currentRound = parseInt(document.getElementById('pos-round-selector').value);
 
@@ -571,7 +703,8 @@
             if(product && product.rounds[currentRound]) {
                 const finalPrice = product.rounds[currentRound].val;
                 cart.push({
-                    name: product.category,
+                    name: product.name,
+                    category: product.category,
                     brand: product.brand,
                     price: finalPrice
                 });
@@ -595,9 +728,13 @@
             
             cart.forEach((item, index) => {
                 total += item.price;
+                const milkTag = item.category === 'Leite' ? ' <span style="font-size:0.8rem; color:#4630d4; font-weight:bold;">[2 UN]</span>' : '';
                 list.innerHTML += `
                     <div class="receipt-item">
-                        <span>${String(index + 1).padStart(2, '0')} - ${item.name} (${item.brand})</span>
+                        <span>
+                            <button onclick="removeFromCart(${index})" title="Remover Item" style="background:none; border:none; color:#d32f2f; cursor:pointer; font-size:1.1rem; margin-right:8px; font-weight:bold;">✖</button>
+                            ${String(index + 1).padStart(2, '0')} - ${item.name} (${item.brand})${milkTag}
+                        </span>
                         <span>${formatMoney(item.price)}</span>
                     </div>
                 `;
@@ -605,6 +742,12 @@
             
             document.getElementById('receipt-total-val').innerText = formatMoney(total);
             document.getElementById('big-total').innerText = formatMoney(total);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+            barcodeInput.focus();
         }
 
         function finishCheckout() {
@@ -618,14 +761,28 @@
             document.getElementById('receipt-change-area').style.display = 'block';
             document.getElementById('receipt-change-val').innerText = formatMoney(troco);
             
-            let status = "✅ Ótimo";
             if(troco < 0) {
                 document.getElementById('receipt-change-val').style.color = "red";
-                status = "❌ Estourou R$100";
+            } else {
+                document.getElementById('receipt-change-val').style.color = "#d35400";
             }
             
-            rankingData.push({ group: groupName, round: round, total: total, troco: troco, status: status });
+            rankingData.push({ 
+                group: groupName, 
+                round: round, 
+                total: total, 
+                troco: troco, 
+                items: [...cart]
+            });
+            
+            saveRanking();
             renderRanking();
+            playCashSound();
+            
+            cart = [];
+            renderCart();
+            document.getElementById('pos-group-name').value = '';
+            document.getElementById('receipt-group-display').innerText = "GRUPO: NÃO INFORMADO";
             
             barcodeInput.focus();
         }
@@ -641,19 +798,68 @@
         function renderRanking() {
             const tbody = document.getElementById('ranking-body');
             tbody.innerHTML = '';
-            let sorted = [...rankingData].sort((a,b) => b.troco - a.troco);
             
-            sorted.forEach(r => {
+            rankingData.forEach((r, index) => {
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${r.group}</strong></td>
                         <td>R${r.round}</td>
                         <td>${formatMoney(r.total)}</td>
                         <td style="color: ${r.troco < 0 ? 'var(--danger)' : 'var(--success)'}; font-weight: bold;">${formatMoney(r.troco)}</td>
-                        <td>${r.status}</td>
+                        <td>
+                            <button class="action-btn" style="color: var(--electric-cyan);" onclick="viewReceipt(${index})" title="Ver Cupom">👁️</button>
+                            <button class="action-btn" style="color: var(--danger);" onclick="deleteRanking(${index})" title="Apagar Registro">🗑️</button>
+                        </td>
                     </tr>
                 `;
             });
+        }
+
+        function deleteRanking(index) {
+            if(confirm("Apagar o registro deste grupo?")) {
+                rankingData.splice(index, 1);
+                saveRanking();
+                renderRanking();
+            }
+        }
+
+        function clearAllRanking() {
+            if(confirm("ATENÇÃO: Tem certeza que deseja limpar todo o placar da turma?")) {
+                rankingData = [];
+                saveRanking();
+                renderRanking();
+            }
+        }
+
+        // ==========================================
+        // AUDITORIA DO CUPOM (MODAL)
+        // ==========================================
+        function viewReceipt(index) {
+            const data = rankingData[index];
+            document.getElementById('modal-group-name').innerText = `GRUPO: ${data.group} (Rodada ${data.round})`;
+            
+            const list = document.getElementById('modal-items');
+            list.innerHTML = '';
+            data.items.forEach((item, i) => {
+                const milkTag = item.category === 'Leite' ? ' <span style="font-size:0.8rem; font-weight:bold;">[2 UN]</span>' : '';
+                list.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${String(i + 1).padStart(2, '0')} - ${item.name} (${item.brand})${milkTag}</span>
+                        <span>${formatMoney(item.price)}</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('modal-total-val').innerText = formatMoney(data.total);
+            const trocoEl = document.getElementById('modal-change-val');
+            trocoEl.innerText = formatMoney(data.troco);
+            trocoEl.style.color = data.troco < 0 ? "#d32f2f" : "#d35400";
+
+            document.getElementById('receipt-modal').style.display = 'flex';
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').style.display = 'none';
         }
 
         // ==========================================
@@ -664,12 +870,10 @@
             container.innerHTML = '';
 
             PRODUCTS.forEach(product => {
-                const subtext = product.category === "Leite" ? "PREÇO TOTAL (2 CAIXAS)" : "PREÇO NORMAL";
-                
                 const tagHTML = `
                     <div class="price-tag">
                         <div class="tag-product-name">${product.name}</div>
-                        <div style="font-size: 0.8rem; color: #555; margin-top: auto;">${subtext}:</div>
+                        <div style="font-size: 0.8rem; color: #555; margin-top: auto;">PREÇO NORMAL:</div>
                         <div class="tag-base-price">${formatMoney(product.base)}</div>
                     </div>
                 `;
@@ -704,16 +908,14 @@
         // GERADOR DE EMBALAGENS (FOTOS + CÓDIGO BARRAS ÚNICO)
         // ==========================================
         function renderPackages() {
-            const containerLarge = document.getElementById('products-large-container');
-            const containerSmall = document.getElementById('products-small-container');
-            containerLarge.innerHTML = '';
-            containerSmall.innerHTML = '';
+            const container = document.getElementById('products-unified-container');
+            container.innerHTML = '';
             
             PRODUCTS.forEach(product => {
                 const barcodeValue = product.id.toString();
                 
                 const html = `
-                    <div class="product-pack ${product.category === 'Arroz' || product.category === 'Farinha' ? 'large' : 'small'}">
+                    <div class="product-pack unified">
                         <div class="product-img-wrapper">
                             <img src="${product.img}" alt="${product.brand}">
                             <div class="barcode-container">
@@ -723,11 +925,7 @@
                     </div>
                 `;
                 
-                if(product.category === 'Arroz' || product.category === 'Farinha') {
-                    containerLarge.innerHTML += html;
-                } else {
-                    containerSmall.innerHTML += html;
-                }
+                container.innerHTML += html;
             });
 
             setTimeout(() => { JsBarcode(".barcode").init(); }, 100);
@@ -748,9 +946,9 @@
                             <tr>
                                 <th>Produto</th>
                                 <th>Marca</th>
-                                <th>Valor Base (Etiqueta Fixa)</th>
+                                <th>Valor Base (Etiqueta)</th>
                                 <th>COLAR O SELO:</th>
-                                <th>Valor Lido no Caixa</th>
+                                <th>Valor Final do Caixa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -779,9 +977,9 @@
                         <tr ${rowClass}>
                             <td>${p.name}</td>
                             <td>${p.brand}</td>
-                            <td>${formatMoney(p.base)}</td>
+                            <td>${formatMoney(p.base)} ${p.category === 'Leite' ? ' (1 un)' : ''}</td>
                             <td style="color: #d32f2f; font-weight:bold;">${rData.promo}</td>
-                            <td>${formatMoney(rData.val)} ${isBest ? '⭐' : ''}</td>
+                            <td>${formatMoney(rData.val)} ${isBest ? '⭐' : ''} ${p.category === 'Leite' ? ' (2 un)' : ''}</td>
                         </tr>
                     `;
                 });
@@ -804,6 +1002,7 @@
         // INICIALIZAÇÃO
         // ==========================================
         window.onload = () => {
+            loadRanking();
             renderLabels();
             renderPromos();
             renderPackages();
