@@ -150,7 +150,6 @@
             z-index: 10;
             line-height: normal;
         }
-        /* Aumentei significativamente o tamanho para os produtos pequenos também */
         .large .barcode-container svg { width: 100%; max-width: 140px; height: 45px; }
         .small .barcode-container svg { width: 100%; max-width: 110px; height: 38px; }
 
@@ -455,72 +454,72 @@
         const PRODUCTS = [
             // ----- ARROZ -----
             { id: 101, category: "Arroz", name: "Arroz Grão Mestre 5kg", brand: "Grão Mestre", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781654520/ndwwy5u8p4cbmpcr4wdb.png", base: 40,
-              rounds: { 1: { promo: "Sem Promoção", val: 40 }, 2: { promo: "10% OFF", val: 36 }, 3: { promo: "20% OFF", val: 32 }, 4: { promo: "25% OFF", val: 30 } }
+              rounds: { 1: { promo: "25% OFF", val: 30 }, 2: { promo: "50% OFF", val: 20 }, 3: { promo: "10% OFF", val: 36 }, 4: { promo: "Sem Promoção", val: 40 } }
             },
-            { id: 102, category: "Arroz", name: "Arroz Prato Cheio 5kg", brand: "Prato Cheio", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781654823/sir3hanjqsi23qqpovek.png", base: 60,
-              rounds: { 1: { promo: "10% OFF", val: 54 }, 2: { promo: "20% OFF", val: 48 }, 3: { promo: "50% OFF", val: 30 }, 4: { promo: "25% OFF", val: 45 } }
+            { id: 102, category: "Arroz", name: "Arroz Prato Cheio 5kg", brand: "Prato Cheio", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781654823/sir3hanjqsi23qqpovek.png", base: 30,
+              rounds: { 1: { promo: "Sem Promoção", val: 30 }, 2: { promo: "10% OFF", val: 27 }, 3: { promo: "20% OFF", val: 24 }, 4: { promo: "Sem Promoção", val: 30 } }
             },
-            { id: 103, category: "Arroz", name: "Arroz Fazenda 5kg", brand: "Fazenda", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655015/ny0jl8kr9qhtg8g3f35q.png", base: 80,
-              rounds: { 1: { promo: "50% OFF", val: 40 }, 2: { promo: "25% OFF", val: 60 }, 3: { promo: "10% OFF", val: 72 }, 4: { promo: "Sem Promoção", val: 80 } }
+            { id: 103, category: "Arroz", name: "Arroz Fazenda 5kg", brand: "Fazenda", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655015/ny0jl8kr9qhtg8g3f35q.png", base: 32,
+              rounds: { 1: { promo: "25% OFF", val: 24 }, 2: { promo: "Sem Promoção", val: 32 }, 3: { promo: "25% OFF", val: 24 }, 4: { promo: "25% OFF", val: 24 } }
             },
-            { id: 104, category: "Arroz", name: "Arroz Ouro Branco 5kg", brand: "Ouro Branco", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655286/hwfb1tsd4ppp1prbhue1.png", base: 30,
-              rounds: { 1: { promo: "Sem Promoção", val: 30 }, 2: { promo: "10% OFF", val: 27 }, 3: { promo: "Sem Promoção", val: 30 }, 4: { promo: "10% OFF", val: 27 } }
+            { id: 104, category: "Arroz", name: "Arroz Ouro Branco 5kg", brand: "Ouro Branco", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655286/hwfb1tsd4ppp1prbhue1.png", base: 50,
+              rounds: { 1: { promo: "50% OFF", val: 25 }, 2: { promo: "20% OFF", val: 40 }, 3: { promo: "50% OFF", val: 25 }, 4: { promo: "50% OFF", val: 25 } }
             },
 
             // ----- FARINHA ----- 
-            { id: 401, category: "Farinha", name: "Farinha Trigo Real 1kg", brand: "Trigo Real", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658477/vzq6lsxl4uyotjptcjxm.png", base: 20,
-              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "50% OFF", val: 10 }, 4: { promo: "25% OFF", val: 15 } }
+            { id: 401, category: "Farinha", name: "Farinha Trigo Real 1kg", brand: "Trigo Real", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658477/vzq6lsxl4uyotjptcjxm.png", base: 10,
+              rounds: { 1: { promo: "Sem Promoção", val: 10 }, 2: { promo: "20% OFF", val: 8 }, 3: { promo: "10% OFF", val: 9 }, 4: { promo: "Sem Promoção", val: 10 } }
             },
-            { id: 402, category: "Farinha", name: "Farinha Branca Neve 1kg", brand: "Branca Neve", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658550/riillri6lnmxisybbd3h.png", base: 40,
-              rounds: { 1: { promo: "50% OFF", val: 20 }, 2: { promo: "25% OFF", val: 30 }, 3: { promo: "10% OFF", val: 36 }, 4: { promo: "20% OFF", val: 32 } }
+            { id: 402, category: "Farinha", name: "Farinha Branca Neve 1kg", brand: "Branca Neve", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658550/riillri6lnmxisybbd3h.png", base: 20,
+              rounds: { 1: { promo: "50% OFF", val: 10 }, 2: { promo: "50% OFF", val: 10 }, 3: { promo: "Sem Promoção", val: 20 }, 4: { promo: "50% OFF", val: 10 } }
             },
-            { id: 403, category: "Farinha", name: "Farinha Padeiro 1kg", brand: "Padeiro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658633/qzfkdshztjp6i1phi3uq.png", base: 10,
-              rounds: { 1: { promo: "10% OFF", val: 9 }, 2: { promo: "Sem Promoção", val: 10 }, 3: { promo: "Sem Promoção", val: 10 }, 4: { promo: "10% OFF", val: 9 } }
+            { id: 403, category: "Farinha", name: "Farinha Padeiro 1kg", brand: "Padeiro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658633/qzfkdshztjp6i1phi3uq.png", base: 12,
+              rounds: { 1: { promo: "25% OFF", val: 9 }, 2: { promo: "50% OFF", val: 6 }, 3: { promo: "Sem Promoção", val: 12 }, 4: { promo: "25% OFF", val: 9 } }
             },
             { id: 404, category: "Farinha", name: "Farinha Massa Fina 1kg", brand: "Massa Fina", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781658672/rlwpyon2w7dtbtbrluky.png", base: 16,
-              rounds: { 1: { promo: "25% OFF", val: 12 }, 2: { promo: "50% OFF", val: 8 }, 3: { promo: "25% OFF", val: 12 }, 4: { promo: "50% OFF", val: 8 } }
+              rounds: { 1: { promo: "50% OFF", val: 8 }, 2: { promo: "25% OFF", val: 12 }, 3: { promo: "50% OFF", val: 8 }, 4: { promo: "25% OFF", val: 12 } }
             },
 
             // ----- FEIJÃO -----
-            { id: 201, category: "Feijão", name: "Feijão Caldo Grosso 1kg", brand: "Caldo Grosso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655488/yreznem8zms6a7rcvz7x.png", base: 20,
-              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "25% OFF", val: 15 }, 3: { promo: "10% OFF", val: 18 }, 4: { promo: "50% OFF", val: 10 } }
+            { id: 201, category: "Feijão", name: "Feijão Caldo Grosso 1kg", brand: "Caldo Grosso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655488/yreznem8zms6a7rcvz7x.png", base: 16,
+              rounds: { 1: { promo: "50% OFF", val: 8 }, 2: { promo: "25% OFF", val: 12 }, 3: { promo: "Sem Promoção", val: 16 }, 4: { promo: "25% OFF", val: 12 } }
             },
-            { id: 202, category: "Feijão", name: "Feijão Da Roça 1kg", brand: "Da Roça", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655775/rjkye4e1rlwvn2hl54he.png", base: 24,
-              rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF", val: 12 }, 3: { promo: "Sem Promoção", val: 24 }, 4: { promo: "25% OFF", val: 18 } }
+            { id: 202, category: "Feijão", name: "Feijão Da Roça 1kg", brand: "Da Roça", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655775/rjkye4e1rlwvn2hl54he.png", base: 10,
+              rounds: { 1: { promo: "Sem Promoção", val: 10 }, 2: { promo: "10% OFF", val: 9 }, 3: { promo: "Sem Promoção", val: 10 }, 4: { promo: "20% OFF", val: 8 } }
             },
-            { id: 203, category: "Feijão", name: "Feijão Panela de Barro 1kg", brand: "Panela de Barro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655957/te7fzhme3wynojka6ekk.png", base: 10,
-              rounds: { 1: { promo: "10% OFF", val: 9 }, 2: { promo: "Sem Promoção", val: 10 }, 3: { promo: "10% OFF", val: 9 }, 4: { promo: "Sem Promoção", val: 10 } }
+            { id: 203, category: "Feijão", name: "Feijão Panela de Barro 1kg", brand: "Panela de Barro", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781655957/te7fzhme3wynojka6ekk.png", base: 20,
+              rounds: { 1: { promo: "50% OFF", val: 10 }, 2: { promo: "50% OFF", val: 10 }, 3: { promo: "50% OFF", val: 10 }, 4: { promo: "10% OFF", val: 18 } }
             },
-            { id: 204, category: "Feijão", name: "Feijão Saboroso 1kg", brand: "Saboroso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656268/bsdxmvj3ndpzxw2kdxyx.png", base: 40,
-              rounds: { 1: { promo: "50% OFF", val: 20 }, 2: { promo: "20% OFF", val: 32 }, 3: { promo: "25% OFF", val: 30 }, 4: { promo: "10% OFF", val: 36 } }
+            { id: 204, category: "Feijão", name: "Feijão Saboroso 1kg", brand: "Saboroso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656268/bsdxmvj3ndpzxw2kdxyx.png", base: 12,
+              rounds: { 1: { promo: "25% OFF", val: 9 }, 2: { promo: "50% OFF", val: 6 }, 3: { promo: "25% OFF", val: 9 }, 4: { promo: "Sem Promoção", val: 12 } }
             },
 
             // ----- CAFÉ -----
             { id: 301, category: "Café", name: "Café Desperta 500g", brand: "Desperta", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656762/toa9bht5r3enrzz4d3yy.png", base: 40,
-              rounds: { 1: { promo: "10% OFF", val: 36 }, 2: { promo: "25% OFF", val: 30 }, 3: { promo: "50% OFF", val: 20 }, 4: { promo: "Sem Promoção", val: 40 } }
+              rounds: { 1: { promo: "50% OFF", val: 20 }, 2: { promo: "25% OFF", val: 30 }, 3: { promo: "50% OFF", val: 20 }, 4: { promo: "20% OFF", val: 32 } }
             },
             { id: 302, category: "Café", name: "Café Bom Dia 500g", brand: "Bom Dia", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781656937/wjgd1mbhpvy4h9czpys0.png", base: 30,
-              rounds: { 1: { promo: "20% OFF", val: 24 }, 2: { promo: "10% OFF", val: 27 }, 3: { promo: "Sem Promoção", val: 30 }, 4: { promo: "20% OFF", val: 24 } }
+              rounds: { 1: { promo: "Sem Promoção", val: 30 }, 2: { promo: "20% OFF", val: 24 }, 3: { promo: "50% OFF", val: 15 }, 4: { promo: "10% OFF", val: 27 } }
             },
             { id: 303, category: "Café", name: "Café Grão Torrado 500g", brand: "Grão Torrado", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657127/lbzcqtzaj3oh3fbn3ut5.png", base: 20,
-              rounds: { 1: { promo: "Sem Promoção", val: 20 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "25% OFF", val: 15 }, 4: { promo: "50% OFF", val: 10 } }
+              rounds: { 1: { promo: "10% OFF", val: 18 }, 2: { promo: "Sem Promoção", val: 20 }, 3: { promo: "20% OFF", val: 16 }, 4: { promo: "25% OFF", val: 15 } }
             },
-            { id: 304, category: "Café", name: "Café Aroma 500g", brand: "Aroma", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657277/cjubnx3jesfaw1wczqxd.png", base: 16,
-              rounds: { 1: { promo: "25% OFF", val: 12 }, 2: { promo: "50% OFF", val: 8 }, 3: { promo: "25% OFF", val: 12 }, 4: { promo: "Sem Promoção", val: 16 } }
+            { id: 304, category: "Café", name: "Café Aroma 500g", brand: "Aroma", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657277/cjubnx3jesfaw1wczqxd.png", base: 24,
+              rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF", val: 12 }, 3: { promo: "25% OFF", val: 18 }, 4: { promo: "Sem Promoção", val: 24 } }
             },
 
             // ----- LEITE -----
-            { id: 501, category: "Leite", name: "Leite Campo Limpo (Combo)", brand: "Campo Limpo", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657453/n4xbu3yvworjucxapajg.png", base: 10,
-              rounds: { 1: { promo: "Sem Promoção", val: 10 }, 2: { promo: "10% OFF", val: 9 }, 3: { promo: "20% OFF", val: 8 }, 4: { promo: "Sem Promoção", val: 10 } }
+            { id: 501, category: "Leite", name: "Leite Campo Limpo (Combo)", brand: "Campo Limpo", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657453/n4xbu3yvworjucxapajg.png", base: 16,
+              rounds: { 1: { promo: "Sem Promoção", val: 16 }, 2: { promo: "25% OFF", val: 12 }, 3: { promo: "50% OFF na 2ª UNID", val: 12 }, 4: { promo: "50% OFF", val: 8 } }
             },
             { id: 502, category: "Leite", name: "Leite Mimoso (Combo)", brand: "Mimoso", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657595/vr9gle0ktsgxvvl9u8dk.png", base: 12,
-              rounds: { 1: { promo: "50% OFF na 2ª Un", val: 9 }, 2: { promo: "Sem Promoção", val: 12 }, 3: { promo: "25% OFF Total", val: 9 }, 4: { promo: "50% OFF na 2ª Un", val: 9 } }
+              rounds: { 1: { promo: "50% OFF na 2ª UNID", val: 9 }, 2: { promo: "Sem Promoção", val: 12 }, 3: { promo: "Sem Promoção", val: 12 }, 4: { promo: "50% OFF na 2ª UNID", val: 9 } }
             },
-            { id: 503, category: "Leite", name: "Leite Via Láctea (Combo)", brand: "Via Láctea", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657728/ao2oomrtt2csw5fzopbw.png", base: 16,
-              rounds: { 1: { promo: "25% OFF Total", val: 12 }, 2: { promo: "50% OFF na 2ª Un", val: 12 }, 3: { promo: "50% OFF Total", val: 8 }, 4: { promo: "25% OFF Total", val: 12 } }
+            { id: 503, category: "Leite", name: "Leite Via Láctea (Combo)", brand: "Via Láctea", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657728/ao2oomrtt2csw5fzopbw.png", base: 20,
+              rounds: { 1: { promo: "50% OFF", val: 10 }, 2: { promo: "10% OFF", val: 18 }, 3: { promo: "50% OFF", val: 10 }, 4: { promo: "Sem Promoção", val: 20 } }
             },
-            { id: 504, category: "Leite", name: "Leite Puro Pasto (Combo)", brand: "Puro Pasto", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657878/pwi3szg4qnpqaqba1o8m.png", base: 20,
-              rounds: { 1: { promo: "10% OFF", val: 18 }, 2: { promo: "20% OFF", val: 16 }, 3: { promo: "Sem Promoção", val: 20 }, 4: { promo: "50% OFF na 2ª Un", val: 15 } }
+            { id: 504, category: "Leite", name: "Leite Puro Pasto (Combo)", brand: "Puro Pasto", img: "https://res.cloudinary.com/dmvxu7ioq/image/upload/v1781657878/pwi3szg4qnpqaqba1o8m.png", base: 24,
+              rounds: { 1: { promo: "25% OFF", val: 18 }, 2: { promo: "50% OFF na 2ª UNID", val: 18 }, 3: { promo: "25% OFF", val: 18 }, 4: { promo: "50% OFF na 2ª UNID", val: 18 } }
             }
         ];
 
